@@ -20,7 +20,7 @@ def get_tasks_by_project(api, p_id):
 
 if __name__ == '__main__':
     flush_cache()
-    api = td.TodoistAPI(os.ENVIRON['TODOIST_SECRET'])
+    api = td.TodoistAPI(os.environ['TODOIST_SECRET'])
     resp = api.sync()
     project_ids = [x['id'] for x in resp['projects']]
     tasks = []
