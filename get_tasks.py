@@ -27,4 +27,4 @@ if __name__ == '__main__':
     for p_id in project_ids:
         tasks.extend(get_tasks_by_project(api, p_id))
     df = pd.DataFrame.from_records(tasks)
-    df.to_csv("tasks.tsv", index=False, sep='\t')
+    df.to_csv("tasks.tsv", encoding="utf-8", index=False, sep='\t')
