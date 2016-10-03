@@ -21,6 +21,17 @@ import pandas as pd
 import shutil
 from IPython import embed
 
+RECURRING_PREFIXES = "every weekly yearly monthly".split()
+
+
+def is_recurring(item):
+    date_string = item['date_string']
+    if date_string:
+        for prefix in RECURRING_PREFIXES:
+            if date_string.startswith(prefix):
+                return True
+    return False
+
 
 def flush_cache(location=None):
     if location is None:
