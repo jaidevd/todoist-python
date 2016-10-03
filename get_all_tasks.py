@@ -32,10 +32,8 @@ def flush_cache(location=None):
 def get_tasks_by_project(api, p_id):
     return api.projects.get_data(p_id)['items']
 
-if __name__ == '__main__':
-    flush_cache()
-    api = td.TodoistAPI(os.environ['TODOIST_SECRET'])
-    resp = api.sync()
+
+def get_history(api):
     offset = 0
     batch_tasks = api.completed.get_all(limit=50, offset=offset)['items']
     task_accumulator = batch_tasks
@@ -44,7 +42,15 @@ if __name__ == '__main__':
         batch_tasks = api.completed.get_all(limit=50,
                 offset=(50 * offset))['items']
         task_accumulator.extend(batch_tasks)
-    completed_df = pd.DataFrame.from_records(task_accumulator)
+    return task_accumulator
+
+
+if __name__ == '__main__':
+    flush_cache()
+    api = td.TodoistAPI(os.environ['TODOIST_SECRET'])
+    resp = api.sync()
+    completed_items = get_history(api)
+    completed_df = pd.DataFrame.from_records(completed_items)
     completed_df.to_csv("completed.tsv", encoding="utf-8", index=False, sep='\t')
 
     # current stack
