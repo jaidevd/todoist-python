@@ -17,7 +17,9 @@
 import todoist as td
 import os
 import os.path as op
+import pandas as pd
 import shutil
+from IPython import embed
 
 
 def flush_cache(location=None):
@@ -25,6 +27,10 @@ def flush_cache(location=None):
         location = op.join(op.expanduser('~'), ".todoist-sync")
     if op.exists(location) and op.isdir(location):
         shutil.rmtree(location)
+
+
+def get_tasks_by_project(api, p_id):
+    return api.projects.get_data(p_id)['items']
 
 if __name__ == '__main__':
     flush_cache()
@@ -35,8 +41,17 @@ if __name__ == '__main__':
     task_accumulator = batch_tasks
     while len(batch_tasks) == 50:
         offset += 1
-        print offset
         batch_tasks = api.completed.get_all(limit=50,
                 offset=(50 * offset))['items']
         task_accumulator.extend(batch_tasks)
-    print len(task_accumulator)
+    completed_df = pd.DataFrame.from_records(task_accumulator)
+    completed_df.to_csv("completed.tsv", encoding="utf-8", index=False, sep='\t')
+
+    # current stack
+    project_ids = [x['id'] for x in resp['projects']]
+    tasks = []
+    for p_id in project_ids:
+        tasks.extend(get_tasks_by_project(api, p_id))
+    current_df = pd.DataFrame.from_records(tasks)
+    current_df.to_csv("tasks.tsv", encoding="utf-8", index=False, sep='\t')
+    embed()
